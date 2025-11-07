@@ -44,12 +44,18 @@ export default function CandidateDetail() {
   async function doSubmit() {
     setUploadMsg('Uploading…')
     setUpProgress(0)
+    const panFile = panRef.current?.files?.[0]
+    const aadFile = aadRef.current?.files?.[0]
+    if (!panFile && !aadFile) {
+      setUploadMsg('Select at least one file (PAN or Aadhaar) before uploading.')
+      return
+    }
     try {
       const res = await submitDocuments(
         id,
         {
-          panFile: panRef.current?.files?.[0],
-          aadhaarFile: aadRef.current?.files?.[0],
+          panFile: panFile,
+          aadhaarFile: aadFile,
           panNumber,
           aadhaarNumber
         },

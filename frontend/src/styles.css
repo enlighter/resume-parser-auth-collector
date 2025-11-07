@@ -22,7 +22,8 @@ header { background: #0f172a; color: #fff; padding: 12px 20px; }
 .progress { height: 8px; background: #e5e7eb; border-radius: 8px; overflow: hidden; }
 .progress > div { height: 100%; background: #0ea5e9; width: 0%; transition: width .2s ease; }
 .row { display: flex; align-items: center; gap: 10px; }
-input[type="file"] { display: none; }
+/* Only hide file inputs when we explicitly opt-in (upload page) */
+.upload-input { display: none; }
 .label-file { padding: 8px 12px; border: 1px dashed #64748b; border-radius: 8px; cursor: pointer; background: #fff; }
 .field { display: flex; flex-direction: column; gap: 6px; }
 input[type="text"] { padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 8px; }

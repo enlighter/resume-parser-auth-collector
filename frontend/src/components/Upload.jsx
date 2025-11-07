@@ -46,7 +46,13 @@ export default function Upload() {
         <p>— or —</p>
         <label className="label-file">
           Choose file
-          <input type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={onPick} ref={fileInput}/>
+          <input
+            className="upload-input"
+            type="file"
+            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            onChange={onPick}
+            ref={fileInput}
+          />
         </label>
       </div>
 
