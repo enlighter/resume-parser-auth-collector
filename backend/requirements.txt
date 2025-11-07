@@ -1,0 +1,23 @@
+# Core
+Django>=5.1,<6.0
+djangorestframework>=3.15,<4.0
+django-cors-headers>=4.4,<5.0
+
+# Resume parsing + validation
+pypdf>=4.2,<5.0
+python-docx>=1.1,<2.0
+phonenumbers>=8.13,<9.0
+python-magic>=0.4,<1.0
+Pillow>=10.4,<11.0
+
+# Utilities
+itsdangerous>=2.2,<3.0
+python-dotenv>=1.0,<2.0
+
+# Optional LLM client (uncomment if you enable USE_LLM)
+# openai>=1.40
+# anthropic>=0.34
+
+# Testing (optional)
+# pytest>=8.0
+# pytest-django>=4.8
