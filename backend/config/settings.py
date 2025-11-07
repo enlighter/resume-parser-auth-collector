@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     "corsheaders",
 
     # Local apps (you will create these)
-    "apps.candidates",
+    "apps.candidates.apps.CandidatesConfig",
     "apps.documents",
     "apps.agent",
 ]
