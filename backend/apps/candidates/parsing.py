@@ -233,30 +233,45 @@ def try_llm_extract(text: str) -> Tuple[Optional[Dict[str, str]], Dict[str, floa
     if not getattr(settings, "USE_LLM", False):
         return None, {}, None
 
-    try:
-        import json
-        from openai import OpenAI  # type: ignore
+    import json
+    from openai import OpenAI
 
-        client = OpenAI(api_key=getattr(settings, "OPENAI_API_KEY", ""))
-        prompt = (
-            "Extract the following fields from the resume text.\n"
-            "Return JSON with keys: name, email, phone, company, designation, skills (array).\n"
-            "If unknown, use empty string or empty array. Phone must be E.164 if possible.\n"
-            "Resume text:\n"
-            f"{text[:12000]}"
-        )
-        resp = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.2,
-            response_format={"type": "json_object"},
-        )
-        raw = resp.choices[0].message.content
-        fields = json.loads(raw or "{}")
-        # trivial confidence assignment for demo
-        conf = {k: 0.9 for k in ["name", "email", "phone", "company", "designation"]}
-        if isinstance(fields.get("skills"), list):
-            conf["skills"] = {s: 0.9 for s in fields["skills"]}
-        return fields, conf, "gpt-4o-mini"
-    except Exception:
-        return None, {}, None
+    client = OpenAI(api_key=getattr(settings, "OPENAI_API_KEY", ""))
+    model = getattr(settings, "OPENAI_MODEL", "gpt-4o-mini")
+
+    # Trim text so you don’t pay to send megabytes
+    snippet = text[:12000]
+
+    system = (
+        "You extract resume fields for an HR pipeline. "
+        "Return strict JSON with keys: name, email, phone, company, designation, skills."
+        "Use E.164 for phone if possible. skills must be an array of strings."
+    )
+    user = f"Resume text:\n{snippet}"
+
+    resp = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ],
+        temperature=0.2,
+        response_format={"type": "json_object"},
+    )
+
+    raw = resp.choices[0].message.content or "{}"
+    fields = json.loads(raw)
+
+    # Confidence scaffolding — adjust if you add model logits or external checks
+    conf = {
+        "name": 0.9 if fields.get("name") else 0.0,
+        "email": 0.95 if fields.get("email") else 0.0,
+        "phone": 0.9 if fields.get("phone") else 0.0,
+        "company": 0.75 if fields.get("company") else 0.0,
+        "designation": 0.75 if fields.get("designation") else 0.0,
+    }
+    if isinstance(fields.get("skills"), list):
+        conf["skills"] = {s: 0.9 for s in fields["skills"]}
+
+    return fields, conf, model
+
